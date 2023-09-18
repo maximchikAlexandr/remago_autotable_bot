@@ -42,6 +42,11 @@ chmod +x install.sh && ./install.sh
 Также вам необходимо в файле **.env** в переменную 
 **TELEGRAM_TOKEN** прописать свой токен для Telegram Bot API
 
+После добавления токена, запустить приложение:
+
+```bash
+docker exec -it tg_app python main.py
+```
 
 ## Токен для Telegram Bot API
 Чтобы получить токен, перейдите на [@BotFather](https://t.me/botfather)
