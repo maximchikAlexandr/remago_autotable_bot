@@ -206,10 +206,10 @@ async def find_other_user(message):
         )
         await bot.delete_state(message.from_user.id, message.chat.id)
         return
-
+    last_name = f"{other_user_data['last_name']} " if other_user_data['last_name'] is not None else ""
     await bot.send_message(
         message.chat.id,
-        f"Введите сообщение для пользователя {other_user_data['last_name']} {other_user_data['first_name']} "
+        f"Введите сообщение для пользователя {last_name}{other_user_data['first_name']} "
         f"{other_user_data['phone_number']}. Пожалуйста, уважайте других пользователей:",
     )
     user_data = await user_facade.get_user_data_by_user_id(message.chat.id)
@@ -232,10 +232,11 @@ async def message_to_other_user(message):
         first_row = "Ваш автомобиль подпёрли! "
 
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+        last_name = f"{data['last_name']} " if data['last_name'] is not None else ""
         await bot.send_message(
             data["other_user_id"],
             f"{first_row} \n"
-            f"Сообщение от пользователя {data['last_name']} {data['first_name']} "
+            f"Сообщение от пользователя {last_name}{data['first_name']} "
             f"{data['phone_number']}: '{message.text}'.",
         )
 
