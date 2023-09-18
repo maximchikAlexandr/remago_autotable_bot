@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: tg_app
+    stdin_open: true
+    tty: true
+    volumes:
+      - ".:/app"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  postgres_db:
+    image: postgres:15
+    container_name: tg_postgres
+    volumes:
+      - "../data/postgresql:/var/lib/postgresql/data"
+    env_file:
+      - .env
+    ports:
+      - "${DB_OUT_PORT}:${DB_PORT}"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
+      interval: 10s
+      retries: 5

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "remago-autotable-bot"
+version = "0.1.0"
+description = ""
+authors = ["Alexandr <maximchik.alexandr@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg2-binary = "^2.9.7"
+sqlalchemy = "^2.0.20"
+alembic = "^1.12.0"
+python-dotenv = "^1.0.0"
+pytelegrambotapi = "^4.13.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
