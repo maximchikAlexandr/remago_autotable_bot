@@ -2,6 +2,7 @@ import re
 
 from src.bot.utils.formatters import to_format_sign
 
+PATTERN_REGISTER_SIGN = r"^([0-9]|E|I)[0-9]{3}[ABEIKMHOPCTX]{2}[0-7]$"
 
 def _is_matches_the_pattern(pattern: str, input_str: str) -> bool:
     match = re.match(pattern, input_str)
@@ -9,8 +10,7 @@ def _is_matches_the_pattern(pattern: str, input_str: str) -> bool:
 
 
 def is_valid_register_sign(sign: str) -> bool:
-    pattern = r"^([0-9]|E|I)[0-9]{3}[ABEIKMHOPCTX]{2}[0-7]$"
-    return _is_matches_the_pattern(pattern, sign)
+    return _is_matches_the_pattern(PATTERN_REGISTER_SIGN, sign)
 
 
 def check_invalid_register_sign(sign: str) -> str:

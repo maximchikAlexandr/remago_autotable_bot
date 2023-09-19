@@ -1,6 +1,7 @@
 from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
+from src.bot.utils.validators import PATTERN_REGISTER_SIGN
 
 Base = declarative_base()
 
@@ -16,5 +17,7 @@ class UserModel(Base):
     register_sign: Mapped[str] = mapped_column(nullable=False, unique=True)
     car_year: Mapped[int] = mapped_column(nullable=False)
     __table_args__ = (
-        CheckConstraint("LENGTH(register_sign) < 15", name="check_length"),
+        CheckConstraint("LENGTH(register_sign) = 7", name="check_length"),
+        CheckConstraint(f"register_sign ~ '{PATTERN_REGISTER_SIGN}'",
+                        name="check_sign_format"),
     )

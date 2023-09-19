@@ -45,5 +45,6 @@ class ExistingRegisterSignFilter(SimpleCustomFilter):
         self.facade = facade
 
     async def check(self, message: Message) -> bool:
-        result = await self.facade.is_existing_register_sign(message.text)
+        register_sign = to_format_sign(message.text)
+        result = await self.facade.is_existing_register_sign(register_sign)
         return result
