@@ -4,7 +4,7 @@ from sqlalchemy import (
     select,
     exists,
 )
-from sqlalchemy.engine.row import Row
+from sqlalchemy.engine.cursor import CursorResult
 from sqlalchemy.sql.dml import Insert
 from sqlalchemy.sql.selectable import Select
 
@@ -16,7 +16,7 @@ class UserFacade:
     MODEL_CLASS = UserModel
 
     def __init__(self, engine_db: EngineDB) -> None:
-        self.engine = engine_db.execution_options(echo=True)
+        self.engine = engine_db
         self.model = self.MODEL_CLASS
 
     async def create(
@@ -53,7 +53,7 @@ class UserFacade:
                     self.model.last_name,
                 ).label("user_data")
             ).where(self.model.register_sign == register_sign)
-            result: Row = await conn.execute(query)
+            result: CursorResult = await conn.execute(query)
             return result.fetchone().user_data
 
     async def get_user_data_by_user_id(self, user_id: int) -> dict:
@@ -68,7 +68,7 @@ class UserFacade:
                     self.model.last_name,
                 ).label("user_data")
             ).where(self.model.user_id == user_id)
-            result: Row = await conn.execute(query)
+            result: CursorResult = await conn.execute(query)
             return result.fetchone().user_data
 
     async def is_existing_user(self, user_id: int) -> bool:
@@ -76,7 +76,7 @@ class UserFacade:
             query: Select = select(
                 exists().where(self.model.user_id == user_id).label("is_existing_user")
             )
-            result: Row = await conn.execute(query)
+            result: CursorResult = await conn.execute(query)
             return result.fetchone().is_existing_user
 
     async def is_existing_register_sign(self, register_sign: str) -> bool:
@@ -86,5 +86,5 @@ class UserFacade:
                 .where(self.model.register_sign == register_sign)
                 .label("is_existing_user")
             )
-            result: Row = await conn.execute(query)
+            result: CursorResult = await conn.execute(query)
             return result.fetchone().is_existing_user

@@ -40,7 +40,7 @@ bot = AsyncTeleBot(TOKEN, parse_mode=None, state_storage=state_storage)
 
 
 @bot.message_handler(commands=["start"])
-async def start(message):
+async def start(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id,
         "Добро пожаловать! Для продолжения работы нажмите кнопку 'Зарегистрироваться':",
@@ -61,7 +61,7 @@ async def start(message):
     func=lambda message: message.text == SIGN_IN_TEXT, is_existing_user=True
 )
 @bot.message_handler(commands=["sign_in"], is_existing_user=True)
-async def is_existing_user(message):
+async def is_existing_user(message: types.Message) -> None:
     await bot.send_message(message.chat.id, "Вы уже зарегистрированы")
 
 
@@ -69,7 +69,7 @@ async def is_existing_user(message):
     func=lambda message: message.text == SIGN_IN_TEXT, is_existing_user=False
 )
 @bot.message_handler(commands=["sign_in"], is_existing_user=False)
-async def start_registration(message):
+async def start_registration(message: types.Message) -> None:
     await bot.set_state(
         message.from_user.id, RegistrationStates.contact, message.chat.id
     )
@@ -81,7 +81,7 @@ async def start_registration(message):
 
 
 @bot.message_handler(content_types=["contact"], state=RegistrationStates.contact)
-async def get_contact_for_registration(message):
+async def get_contact_for_registration(message: types.Message) -> None:
     if message.contact is not None:
         async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             for field in ("phone_number", "first_name", "last_name", "user_id"):
@@ -102,7 +102,7 @@ async def get_contact_for_registration(message):
     is_existing_register_sign=False,
     is_existing_user=False,
 )
-async def get_register_sign_for_registration(message):
+async def get_register_sign_for_registration(message: types.Message) -> None:
     await bot.set_state(
         message.from_user.id, RegistrationStates.car_year, message.chat.id
     )
@@ -112,7 +112,7 @@ async def get_register_sign_for_registration(message):
 
 
 @bot.message_handler(state=RegistrationStates.car_year, is_valid_car_year=True)
-async def save_new_user(message):
+async def save_new_user(message: types.Message) -> None:
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         await user_facade.create(
             user_id=data["user_id"],
@@ -142,7 +142,7 @@ async def save_new_user(message):
 @bot.message_handler(
     state="*", content_types=["text"], func=lambda message: message.text == CANCEL_TEXT
 )
-async def cancel(message):
+async def cancel(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id, "Действие отменено", reply_markup=get_main_keyboard()
     )
@@ -153,7 +153,7 @@ async def cancel(message):
     func=lambda message: message.text == MY_CAR_IS_BLOCKED_TEXT, is_existing_user=True
 )
 @bot.message_handler(commands=["my_car_is_blocked"], is_existing_user=True)
-async def my_car_is_blocked(message):
+async def my_car_is_blocked(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id,
         "Мы постараемся помочь Вам с этой проблемой. "
@@ -169,7 +169,7 @@ async def my_car_is_blocked(message):
     func=lambda message: message.text == MY_CAR_BLOCKES_TEXT, is_existing_user=True
 )
 @bot.message_handler(commands=["my_car_blockes"], is_existing_user=True)
-async def my_car_blockes(message):
+async def my_car_blockes(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id,
         "Мы постараемся помочь Вам с этой проблемой. "
@@ -186,8 +186,8 @@ async def my_car_blockes(message):
     is_valid_register_sign=True,
     is_existing_user=True,
 )
-async def find_other_user(message):
-    state = await bot.get_state(message.from_user.id, message.chat.id)
+async def find_other_user(message: types.Message) -> None:
+    state: str = await bot.get_state(message.from_user.id, message.chat.id)
     if state == "CarIsBlockedStates:register_sign":
         await bot.set_state(
             message.from_user.id, CarIsBlockedStates.message, message.chat.id
@@ -199,8 +199,8 @@ async def find_other_user(message):
 
     await bot.send_message(message.chat.id, "Ищем пользователей")
     try:
-        register_sign = to_format_sign(message.text)
-        other_user_data = await user_facade.get_user_data_by_register_sign(
+        register_sign: str = to_format_sign(message.text)
+        other_user_data: dict = await user_facade.get_user_data_by_register_sign(
             register_sign
         )
     except AttributeError:
@@ -211,7 +211,7 @@ async def find_other_user(message):
         )
         await bot.delete_state(message.from_user.id, message.chat.id)
         return
-    last_name = (
+    last_name: str = (
         f"{other_user_data['last_name']} "
         if other_user_data["last_name"] is not None
         else ""
@@ -221,7 +221,7 @@ async def find_other_user(message):
         f"Введите сообщение для пользователя {last_name}{other_user_data['first_name']} "
         f"{other_user_data['phone_number']}. Пожалуйста, уважайте других пользователей:",
     )
-    user_data = await user_facade.get_user_data_by_user_id(message.chat.id)
+    user_data: dict = await user_facade.get_user_data_by_user_id(message.chat.id)
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data["other_user_id"] = other_user_data["user_id"]
         data["phone_number"] = user_data["phone_number"]
@@ -232,9 +232,9 @@ async def find_other_user(message):
 @bot.message_handler(
     state=[CarIsBlockedStates.message, CarBlockesStates.message], is_existing_user=True
 )
-async def message_to_other_user(message):
-    state = await bot.get_state(message.from_user.id, message.chat.id)
-    first_row = ""
+async def message_to_other_user(message: types.Message) -> None:
+    state: str = await bot.get_state(message.from_user.id, message.chat.id)
+    first_row: str = ""
     if state == "CarIsBlockedStates:message":
         first_row = "Внимание, Вы подпёрли автомобиль!"
     elif state == "CarBlockesStates:message":
@@ -261,7 +261,7 @@ async def message_to_other_user(message):
 @bot.message_handler(
     commands=["my_car_is_blocked", "my_car_blockes"], is_existing_user=False
 )
-async def not_existing_user(message):
+async def not_existing_user(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id, "Для данного действия нужно зарегистрироваться."
     )
@@ -275,7 +275,7 @@ async def car_year_incorrect(message):
 @bot.message_handler(
     state=RegistrationStates.register_sign, is_existing_register_sign=True
 )
-async def existing_register_sign(message):
+async def existing_register_sign(message: types.Message) -> None:
     await bot.send_message(
         message.chat.id, "Данный номер автомобиля уже зарегистрирован"
     )
@@ -289,8 +289,8 @@ async def existing_register_sign(message):
     ],
     is_valid_register_sign=False,
 )
-async def register_sign_incorrect(message):
-    msg_text = check_invalid_register_sign(message.text)
+async def register_sign_incorrect(message: types.Message) -> None:
+    msg_text: str = check_invalid_register_sign(message.text)
     await bot.send_message(message.chat.id, msg_text)
 
 

@@ -8,26 +8,26 @@ from src.bot.constants import (
 )
 
 
-def get_cancel_keyboard():
+def get_cancel_keyboard() -> types.ReplyKeyboardMarkup:
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     keyboard.add(types.KeyboardButton(text=CANCEL_TEXT))
     return keyboard
 
 
-def get_main_keyboard():
+def get_main_keyboard() -> types.ReplyKeyboardMarkup:
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     keyboard.add(types.KeyboardButton(text=MY_CAR_BLOCKES_TEXT))
     keyboard.add(types.KeyboardButton(text=MY_CAR_IS_BLOCKED_TEXT))
     return keyboard
 
 
-def get_registration_keyboard():
+def get_registration_keyboard() -> types.ReplyKeyboardMarkup:
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     keyboard.add(types.KeyboardButton(text=SIGN_IN_TEXT))
     return keyboard
 
 
-def get_contact_keyboard():
+def get_contact_keyboard() -> types.ReplyKeyboardMarkup:
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     button_phone = types.KeyboardButton(text="Поделиться данными", request_contact=True)
     keyboard.add(button_phone)
