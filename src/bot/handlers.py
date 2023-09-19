@@ -24,6 +24,8 @@ from src.bot.keyboards import (
     get_registration_keyboard,
 )
 from src.bot.stages import CarBlockesStates, CarIsBlockedStates, RegistrationStates
+from src.bot.utils.formatters import to_format_sign
+from src.bot.utils.validators import check_invalid_register_sign
 from src.db.settings import EngineDB
 from src.facades import UserFacade
 
@@ -106,7 +108,7 @@ async def get_register_sign_for_registration(message):
     )
     await bot.send_message(message.chat.id, "Введите год своего автомобиля:")
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data["register_sign"] = message.text
+        data["register_sign"] = to_format_sign(message.text)
 
 
 @bot.message_handler(state=RegistrationStates.car_year, is_valid_car_year=True)
@@ -197,7 +199,10 @@ async def find_other_user(message):
 
     await bot.send_message(message.chat.id, "Ищем пользователей")
     try:
-        other_user_data = await user_facade.get_user_data_by_register_sign(message.text)
+        register_sign = to_format_sign(message.text)
+        other_user_data = await user_facade.get_user_data_by_register_sign(
+            register_sign
+        )
     except AttributeError:
         await bot.send_message(
             message.chat.id,
@@ -206,7 +211,11 @@ async def find_other_user(message):
         )
         await bot.delete_state(message.from_user.id, message.chat.id)
         return
-    last_name = f"{other_user_data['last_name']} " if other_user_data['last_name'] is not None else ""
+    last_name = (
+        f"{other_user_data['last_name']} "
+        if other_user_data["last_name"] is not None
+        else ""
+    )
     await bot.send_message(
         message.chat.id,
         f"Введите сообщение для пользователя {last_name}{other_user_data['first_name']} "
@@ -232,7 +241,7 @@ async def message_to_other_user(message):
         first_row = "Ваш автомобиль подпёрли! "
 
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        last_name = f"{data['last_name']} " if data['last_name'] is not None else ""
+        last_name = f"{data['last_name']} " if data["last_name"] is not None else ""
         await bot.send_message(
             data["other_user_id"],
             f"{first_row} \n"
@@ -281,7 +290,9 @@ async def existing_register_sign(message):
     is_valid_register_sign=False,
 )
 async def register_sign_incorrect(message):
-    await bot.send_message(message.chat.id, "Номер автомобиля введен некорректно")
+    msg_text = check_invalid_register_sign(message.text)
+    await bot.send_message(message.chat.id, msg_text)
+
 
 bot.add_custom_filter(asyncio_filters.StateFilter(bot))
 bot.add_custom_filter(ValidRegisterSignFilter())

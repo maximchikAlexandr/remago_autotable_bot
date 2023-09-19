@@ -2,12 +2,16 @@ import datetime
 
 from telebot.asyncio_filters import SimpleCustomFilter
 
+from src.bot.utils.formatters import to_format_sign
+from src.bot.utils.validators import is_valid_register_sign
+
 
 class ValidRegisterSignFilter(SimpleCustomFilter):
     key = "is_valid_register_sign"
 
     async def check(self, message):
-        return "1" in str(message.text)
+        register_sign = to_format_sign(message.text)
+        return is_valid_register_sign(register_sign)
 
 
 class ValidCarYearFilter(SimpleCustomFilter):
