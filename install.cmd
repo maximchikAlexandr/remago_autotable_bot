@@ -8,4 +8,4 @@ echo SQLALCHEMY_LOG_LEVEL=CRITICAL >> .env
 echo TELEGRAM_TOKEN= >> .env
 
 docker compose up -d --build && \
-docker exec -it pc_app alembic upgrade head
+docker exec -it tg_app alembic upgrade head
