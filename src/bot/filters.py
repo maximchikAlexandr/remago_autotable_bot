@@ -1,19 +1,24 @@
 import datetime
 
-from telebot import SimpleCustomFilter
+from telebot.asyncio_filters import SimpleCustomFilter
+from telebot.types import Message
+
+from src.bot.utils.formatters import to_format_sign
+from src.bot.utils.validators import is_valid_register_sign
 
 
 class ValidRegisterSignFilter(SimpleCustomFilter):
     key = "is_valid_register_sign"
 
-    def check(self, message):
-        return "1" in str(message.text)
+    async def check(self, message: Message) -> bool:
+        register_sign = to_format_sign(message.text)
+        return is_valid_register_sign(register_sign)
 
 
 class ValidCarYearFilter(SimpleCustomFilter):
     key = "is_valid_car_year"
 
-    def check(self, message):
+    async def check(self, message: Message) -> bool:
         current_year = datetime.datetime.now().year
         return (
             message.text.isdigit()
@@ -28,8 +33,9 @@ class ExistingUsersFilter(SimpleCustomFilter):
     def __init__(self, facade=None) -> None:
         self.facade = facade
 
-    def check(self, message):
-        return self.facade.is_existing_user(message.chat.id)
+    async def check(self, message: Message) -> bool:
+        result = await self.facade.is_existing_user(message.chat.id)
+        return result
 
 
 class ExistingRegisterSignFilter(SimpleCustomFilter):
@@ -38,5 +44,6 @@ class ExistingRegisterSignFilter(SimpleCustomFilter):
     def __init__(self, facade=None) -> None:
         self.facade = facade
 
-    def check(self, message):
-        return self.facade.is_existing_register_sign(message.text)
+    async def check(self, message: Message) -> bool:
+        result = await self.facade.is_existing_register_sign(message.text)
+        return result

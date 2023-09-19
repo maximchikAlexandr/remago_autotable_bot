@@ -18,5 +18,5 @@ echo "DB_OUT_PORT=$DB_OUT_PORT" >> .env
 echo "SQLALCHEMY_LOG_LEVEL=$SQLALCHEMY_LOG_LEVEL" >> .env
 echo "TELEGRAM_TOKEN=$TELEGRAM_TOKEN" >> .env
 
-docker-compose up -d --build && \
+docker compose up -d --build && \
 docker exec -it tg_app alembic upgrade head
