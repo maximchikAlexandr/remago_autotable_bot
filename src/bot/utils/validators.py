@@ -39,7 +39,7 @@ def check_invalid_register_sign(sign: str) -> str:
 
     if not _is_matches_the_pattern(series_pattern, series):
         message = f"⛔️ Серия регистрационного знака '{series}' некорректна. " \
-                  f"Серия состоять из 2 букв. Разрешенные буквы: ABEIKMHOPCTX"
+                  f"Серия должна состоять из 2 букв. Разрешенные буквы: ABEIKMHOPCTX"
         messages.append(message)
 
     if not _is_matches_the_pattern(code_pattern, code):
