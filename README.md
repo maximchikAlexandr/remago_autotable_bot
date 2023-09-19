@@ -46,7 +46,7 @@ chmod +x install.sh && ./install.sh
 Запустить файл со скриптом:
 
 ```powershell
-./install.cmd
+install.cmd
 ```
 
 Данные скрипты создают файл **.env** с переменными окружения.
